@@ -3,37 +3,83 @@
   <head>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
+     <link rel="stylesheet" type="text/css" href="styles.css">
   </head>
-  <body>
 
+  <body>
+   <div id="container">
+      <div id="header">
+        <h1>Twittler</h1>
+      </div>
+      
+      <div id="button">
+        <button type="button">Get Tweets</button>
+      </div>
+      
+      <div id="tweetFeed">
+        <!-- Tweets go here -->
+      </div>
+
+      <div id="footer">
+        <h3>Twittler</h3>
+      </div>
+    </div>
+
+<!--  -->
 
     <script>
-
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
-        var $tweets = $('.tweets');
-
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('Time: '+Date()+' '+'@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($('.tweets'));
-          //$('.tweets').append($tweet);
-          index -= 1;
+  
+        var $tweetFeed = $('#tweetFeed');     
+        var index, newIndex, val, diff;
+        function refreshTweets() {
+          index = streams.home.length - 1; //number of tweets 
+          while(index >= 0){ //prints the values in the object
+            var tweet = streams.home[index];
+            var $tweet = $('<div class="oneTweet"></div>');
+            $tweet.html(Date()+': '+'@' + '<a href="#" class = "tweetUser">' + tweet.user + '</a>' + ': ' + tweet.message);
+            $tweet.appendTo($tweetFeed); //this adds tweets to body
+            index -= 1; //decrement the counter
+          }
         }
-
+        //gets the difference value to change the index
+        function getValue() {
+          newIndex = streams.home.length-1; //update total number of tweets
+          val = $(document.body).find(".oneTweet").length; //number of existing tweets on current page
+          diff = newIndex - val; //number of unshown tweets
+        }        
+        
+        //adds new tweets
+        function addNewTweets() {
+          var startIndex = val;
+          var endIndex = val+diff;
+    
+          while(startIndex <= endIndex){
+            var tweet = streams.home[startIndex];
+            var $tweet = $('<div class="oneTweet"></div>');
+            $tweet.html(Date()+': '+'@' + '<a href="#" class = "tweetUser">' + tweet.user + '</a>' + ': ' + tweet.message);
+            $tweet.prependTo($tweetFeed);
+            startIndex += 1;
+          }
+        }
+     
+        refreshTweets(); //function call to initially load tweets.
+        //adds new tweets when button pressed
+        $(document.body).on('click', 'button', function() {      
+          $('#tweetFeed div').show();
+          getValue(); 
+          addNewTweets(); 
+        });
+        //shows only tweets from clicked user-name
+        $(document.body).on('click', '.tweetUser', function() {            
+          var filterPerson = $(this).html(); //extracts value of name by clicking on user-name link
+          if (filterPerson) {              
+             $('#tweetFeed div').hide(); //hides tweet divs
+             $('div div:contains(' + filterPerson +')').show(); //only show tweets by tweet user 
+          }
+        });
+        
       });
-
     </script>
-    <div class="new">
-    <h1>What's New?</h1>
-    I'm text.
-    </div>
-    <div class="tweets">
-    <h1> Tweets </h1>
-    </div>
   </body>
 </html>
